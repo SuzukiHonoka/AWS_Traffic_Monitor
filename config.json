@@ -1,1 +1,1 @@
-[{"Name":"Ubuntu-1","Limit":{"Unit":"GB","Value":1000},"Command":["sudo reboot"]}]
+[{"Name":"Ubuntu-1","Limit":{"Unit":"GB","Value":1000},"Command":["sudo poweroff"]}]
