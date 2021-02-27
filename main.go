@@ -16,32 +16,41 @@ import (
 
 func main() {
 	var instances []Instance
-	cPath := flag.String("c","","path to json config")
+	cPath := flag.String("c", "", "path to json config")
+	loop := flag.Int("l", 0, "interval for loop")
 	flag.Parse()
-	if len(*cPath) == 0{
+	if len(*cPath) == 0 {
 		fmt.Println("config not found")
 		os.Exit(1)
-	}else {
-		if _,err := os.Stat(*cPath);os.IsNotExist(err){
-			fmt.Printf("Writing empty config file to %s",*cPath)
-			b,err := json.Marshal([]Instance{{
+	} else {
+		if _, err := os.Stat(*cPath); os.IsNotExist(err) {
+			fmt.Printf("Writing empty config file to %s", *cPath)
+			b, err := json.Marshal([]Instance{{
 				Name:    "",
 				Limit:   Limit{},
 				Command: []string{},
 			}})
 			handler(err)
-			err = ioutil.WriteFile(*cPath,b,os.ModePerm)
+			err = ioutil.WriteFile(*cPath, b, os.ModePerm)
 			handler(err)
 			fmt.Println("Config written")
-		}else {
-			b,err := ioutil.ReadFile(*cPath)
+		} else {
+			b, err := ioutil.ReadFile(*cPath)
 			handler(err)
-			err = json.Unmarshal(b,&instances)
+			err = json.Unmarshal(b, &instances)
 			handler(err)
 		}
 	}
 	now := time.Now()
 	Check(instances, now)
+	if *loop > 0 {
+		for {
+			fmt.Println("Looping..")
+			time.Sleep(time.Duration(*loop) * time.Second)
+			now = time.Now()
+			Check(instances, now)
+		}
+	}
 }
 
 func BeginningOfDay(now time.Time) time.Time {
@@ -68,7 +77,7 @@ func BytesToUint(value float64, unit string) float32 {
 
 func Check(units []Instance, time time.Time) {
 	start, end := BeginningOfDay(time).Unix(), EndOfDay(time).Unix()
-	fmt.Println("Check start..")
+	fmt.Println("----------")
 	for i, v := range units {
 		var total int
 		fmt.Printf("Instance Index: %d Name: %s\n", i, v.Name)
@@ -81,16 +90,20 @@ func Check(units []Instance, time time.Time) {
 		}
 		fmt.Printf("Total Used: %d %s\n", total, v.Limit.Unit)
 		if total >= v.Limit.Value {
-			fmt.Printf("Overflow:  ")
+			more := total - v.Limit.Value
+			fmt.Printf("Overflow: %d (%s)", more, strconv.Itoa(int(float32(more)/float32(v.Limit.Value)*100))+"%")
 			fmt.Println("Trigger Fallback CMD..")
-			for i,vvv := range v.Command{
-				fmt.Printf("Command Index: %d CMD: [%s]\n",i,vvv)
-				fmt.Printf( "Excuted: [%s]\n",Exec(vvv))
+			for i, vvv := range v.Command {
+				fmt.Printf("Command Index: %d CMD: [%s]\n", i, vvv)
+				fmt.Printf("Excuted: [%s]\n", Exec(vvv))
 			}
+			fmt.Println("Exit Normally")
+			os.Exit(0)
 		} else {
 			left := v.Limit.Value - total
 			fmt.Printf("Traffic Left: %d %s (%s)\n", left, v.Limit.Unit, strconv.Itoa(int(float32(left)/float32(v.Limit.Value)*100))+"%")
 		}
+		fmt.Println("----------")
 	}
 }
 

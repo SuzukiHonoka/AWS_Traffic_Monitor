@@ -4,6 +4,7 @@ When the usage reached the limit you set, the tool can execute the cmd you pre-d
 
 # Usage
 - -c Path to config file [json]
+- -l Interval for loop [second]
 
 ## Config Example
 ```text
