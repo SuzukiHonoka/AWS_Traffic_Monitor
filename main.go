@@ -22,25 +22,24 @@ func main() {
 	if len(*cPath) == 0 {
 		fmt.Println("config not found")
 		os.Exit(1)
-	} else {
-		if _, err := os.Stat(*cPath); os.IsNotExist(err) {
-			fmt.Printf("Writing empty config file to %s", *cPath)
-			b, err := json.Marshal([]Instance{{
-				Name:    "",
-				Limit:   Limit{},
-				Command: []string{},
-			}})
-			handler(err)
-			err = ioutil.WriteFile(*cPath, b, os.ModePerm)
-			handler(err)
-			fmt.Println("Config written")
-		} else {
-			b, err := ioutil.ReadFile(*cPath)
-			handler(err)
-			err = json.Unmarshal(b, &instances)
-			handler(err)
-		}
 	}
+	if _, err := os.Stat(*cPath); os.IsNotExist(err) {
+		fmt.Printf("Writing empty config file to %s", *cPath)
+		b, err := json.Marshal([]Instance{{
+			Name:    "",
+			Limit:   Limit{},
+			Command: []string{},
+		}})
+		checkError(err)
+		err = ioutil.WriteFile(*cPath, b, os.ModePerm)
+		checkError(err)
+		fmt.Println("Config written")
+		return
+	}
+	b, err := ioutil.ReadFile(*cPath)
+	checkError(err)
+	err = json.Unmarshal(b, &instances)
+	checkError(err)
 	now := time.Now()
 	Check(instances, now)
 	if *loop > 0 {
@@ -83,7 +82,7 @@ func Check(units []Instance, time time.Time) {
 		fmt.Printf("Instance Index: %d Name: %s\n", i, v.Name)
 		for _, vv := range metricNames {
 			var data Data
-			handler(json.Unmarshal([]byte(Exec(fmt.Sprintf(cmd, v.Name, vv, start, end, 2678400))), &data))
+			checkError(json.Unmarshal([]byte(Exec(fmt.Sprintf(cmd, v.Name, vv, start, end, 2678400))), &data))
 			used := int(BytesToUint(data.MetricData[0].Sum, v.Limit.Unit))
 			total += used
 			fmt.Printf("Metric: %s Used: %d %s\n", vv, used, v.Limit.Unit)
@@ -107,7 +106,7 @@ func Check(units []Instance, time time.Time) {
 	}
 }
 
-func handler(err error) {
+func checkError(err error) {
 	if err != nil {
 		panic(err)
 	}
@@ -116,6 +115,6 @@ func handler(err error) {
 func Exec(cmd string) string {
 	args := strings.Split(cmd, " ")
 	result, err := exec.Command(args[0], args[1:]...).Output()
-	handler(err)
+	checkError(err)
 	return string(result)
 }
