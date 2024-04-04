@@ -1,3 +1,3 @@
 module AWS_Trafiic_Monitor
 
-go 1.18
+go 1.22
