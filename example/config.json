@@ -1,12 +1,19 @@
-[
-  {
-    "Name": "Ubuntu-1",
-    "Limit": {
-      "Unit": "GB",
-      "Value": 1000
-    },
-    "Command": [
-      "sudo poweroff"
-    ]
+{
+  "interval": "10s",
+  "instance": [
+    {
+      "Name": "Ubuntu-1",
+      "Limit": {
+        "Unit": "GB",
+        "Value": 500
+      },
+      "CommandList": [
+        "shutdown"
+      ]
+    }
+  ],
+  "aws": {
+    "accessKeyId": "accessKeyId",
+    "secretAccessKey": "secretAccessKey"
   }
-]
+}

@@ -11,7 +11,7 @@ const (
 	UnitTB = "TB"
 )
 
-func (u Unit) BytesToUnit(value float64) float64 {
+func (u Unit) FromBytes(value float64) float64 {
 	switch strings.ToUpper(string(u)) {
 	case UnitGB:
 		return value / (1 << 30)

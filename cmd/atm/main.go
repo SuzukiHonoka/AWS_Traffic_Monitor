@@ -1,42 +1,48 @@
 package main
 
 import (
-	"AWS_Trafiic_Monitor/internal/instance"
-	"AWS_Trafiic_Monitor/internal/utils"
+	"AWS_Trafiic_Monitor/pkg/atm"
 	"flag"
 	"log"
-	"time"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 var (
-	configPath   = flag.String("c", "./config.json", "path to json config")
-	loopInterval = flag.Int("l", 0, "interval for loop")
+	// General config
+	configPath = flag.String("c", "./config.json", "path to json config")
 )
 
 func init() {
-	// check if aws cli is installed
-	utils.CheckAwsCli()
-
 	// parse flags
 	flag.Parse()
 }
 
 func main() {
-	// parse flags
-	path := *configPath
-
-	// load config
-	instances, err := instance.Load(path)
+	// Load config
+	cfg, err := atm.LoadFromFile(*configPath)
 	if err != nil {
 		log.Fatalf("failed to load config, err=%v", err)
 	}
 
-	instances.Check()
-	if interval := *loopInterval; interval > 0 {
-		for {
-			log.Println("Looping..")
-			time.Sleep(time.Duration(interval) * time.Second)
-			instances.Check()
-		}
+	// Create ATM instance
+	a, err := atm.New(cfg)
+	if err != nil {
+		log.Fatalf("failed to create ATM instance, err=%v", err)
 	}
+
+	// Start ATM
+	go func() {
+		if err = a.Start(); err != nil {
+			log.Fatalf("failed to start ATM, err=%v", err)
+		}
+	}()
+	defer a.Stop()
+
+	// Wait for interrupt signal
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	<-sig
+	log.Println("Received interrupt signal, stopping ATM...")
 }

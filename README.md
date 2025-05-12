@@ -1,30 +1,78 @@
 # AWS Traffic Monitor
 
-This monitor is based in aws cli v2, and it can simply check the usage of the traffic by calling in cli.  
-When the usage reached the limit you set, the tool can execute the cmd you pre-defined.
+A lightweight monitoring tool for AWS services that tracks network traffic usage and executes predefined actions when usage limits are reached.
 
-# Requirement
+## Overview
 
-- aws cli v2
+AWS Traffic Monitor uses the official AWS Go SDK to check traffic usage for your AWS resources. When usage exceeds your configured limits, the tool can automatically execute custom commands or perform API actions like shutting down instances to prevent additional charges.
 
-if you are not installed currently you may go to
-this [Refer](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html) for more details.
+## Features
 
-# Usage
+- Real-time monitoring of AWS network traffic
+- Configurable usage limits with custom actions
+- Direct AWS API integration (no AWS CLI required)
+- Built-in shutdown functionality via AWS API
+- Periodic checking with adjustable intervals
+- Simple JSON configuration format
 
-- -c Path to config file [json]
-- -l Interval for loop [second]
+## Requirements
 
-## Config Example
+- Properly configured AWS credentials
+- Go 1.16+ (for building from source)
 
-```text
-[{"Name":"Ubuntu-1","Limit":{"Unit":"GB","Value":1000},"Command":["sudo poweroff"]}]
+## Usage
+
+```bash
+# Basic usage
+atm -c config.json
 ```
 
-# Limitation
+### Command Line Arguments
 
-The monitor now only support the **lightsail**.
+- `-c` Path to config file (JSON format)
 
-# Author
+## Configuration
 
-Made by starx and under **GNU GPLv3** LICENCE.
+Create a JSON configuration file with your instance details, limits, and actions:
+
+```json
+[
+  {
+    "Name": "Ubuntu-1",
+    "Limit": {
+      "Unit": "GB", 
+      "Value": 1000
+    },
+    "Command": ["shutdown"]
+  },
+  {
+    "Name": "WebServer",
+    "Limit": {
+      "Unit": "GB",
+      "Value": 500
+    },
+    "Command": ["sudo service nginx stop"]
+  }
+]
+```
+
+Each entry in the configuration array represents a monitored instance with:
+- `Name`: Instance identifier
+- `Limit`: Traffic limit with unit and value
+- `Command`: Array of commands to execute when limit is reached
+    - Use `"shutdown"` to force shutdown the instance via AWS API
+
+## Supported Services
+
+Currently, AWS Traffic Monitor supports:
+- **Amazon Lightsail**
+
+Support for additional AWS services is planned for future releases.
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the LICENSE file for details.
+
+## Author
+
+Created by SuzukiHonoka (starx)
