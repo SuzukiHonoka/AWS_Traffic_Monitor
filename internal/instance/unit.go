@@ -1,7 +1,6 @@
 package instance
 
 import (
-	"math"
 	"strings"
 )
 
@@ -12,12 +11,12 @@ const (
 	UnitTB = "TB"
 )
 
-func (u Unit) BytesToUnit(value float64) float32 {
+func (u Unit) BytesToUnit(value float64) float64 {
 	switch strings.ToUpper(string(u)) {
 	case UnitGB:
-		return float32(value / math.Pow(1024, 3))
+		return value / (1 << 30)
 	case UnitTB:
-		return float32(value / math.Pow(1024, 4))
+		return value / (1 << 40)
 	default:
 		return 0
 	}

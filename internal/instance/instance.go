@@ -24,13 +24,15 @@ func (x *Instance) Check() {
 	for _, name := range MetricNames {
 		md, err := newAPI.MetricDataMonth(name)
 		if err != nil {
-			log.Printf("Get data of metric: %s failed, err=%s", name, err)
+			log.Fatalf("Get data of metric: %s failed, err=%s", name, err)
+		}
+
+		if len(md.Data) == 0 {
+			log.Printf("No data of metric: %s", name)
 			continue
 		}
-		used := 0
-		if len(md.Data) > 0 {
-			used = int(x.Limit.Unit.BytesToUnit(md.Data[0].Sum))
-		}
+
+		used := int(x.Limit.Unit.BytesToUnit(md.Data[0].Sum))
 		total += used
 		log.Printf("Metric: %s Used: %d %s\n", name, used, x.Limit.Unit)
 	}
@@ -38,11 +40,11 @@ func (x *Instance) Check() {
 
 	if total < x.Limit.Value {
 		left := x.Limit.Value - total
-		log.Printf("Traffic Left: %d %s (%.2f %%)", left, x.Limit.Unit, float32(left)/float32(x.Limit.Value)*100)
+		log.Printf("Traffic Left: %d %s (%.2f %%)", left, x.Limit.Unit, float64(left)/float64(x.Limit.Value)*100)
 	} else {
 		overflow := total - x.Limit.Value
 		if overflow > 0 {
-			log.Printf("Overflow: %d %s (%.2f %%)", overflow, x.Limit.Unit, float32(total)/float32(x.Limit.Value)*100)
+			log.Printf("Overflow: %d %s (%.2f %%)", overflow, x.Limit.Unit, float64(total)/float64(x.Limit.Value)*100)
 		}
 		log.Println("Trigger Fallback commands..")
 		x.ExecuteCommand()
@@ -58,6 +60,7 @@ func (x *Instance) ExecuteCommand() {
 		b, err := utils.Execute(cmd)
 		if err != nil {
 			log.Printf("Execute command: %s failed, err=%s", cmd, err)
+			continue
 		}
 		log.Printf("Commaned: %s excuted: %s", cmd, string(b))
 	}

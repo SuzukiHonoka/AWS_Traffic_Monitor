@@ -8,24 +8,34 @@ import (
 	"time"
 )
 
+var (
+	configPath   = flag.String("c", "./config.json", "path to json config")
+	loopInterval = flag.Int("l", 0, "interval for loop")
+)
+
 func init() {
+	// check if aws cli is installed
 	utils.CheckAwsCli()
+
+	// parse flags
+	flag.Parse()
 }
 
 func main() {
 	// parse flags
-	cPath := flag.String("c", "./config.json", "path to json config")
-	loop := flag.Int("l", 0, "interval for loop")
-	flag.Parse()
-	path := *cPath
+	path := *configPath
+
 	// load config
 	instances, err := instance.Load(path)
-	utils.CheckError(err)
+	if err != nil {
+		log.Fatalf("failed to load config, err=%v", err)
+	}
+
 	instances.Check()
-	if *loop > 0 {
+	if interval := *loopInterval; interval > 0 {
 		for {
 			log.Println("Looping..")
-			time.Sleep(time.Duration(*loop) * time.Second)
+			time.Sleep(time.Duration(interval) * time.Second)
 			instances.Check()
 		}
 	}

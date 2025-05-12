@@ -12,11 +12,11 @@ func Load(path string) (*Instances, error) {
 	if err != nil {
 		return nil, err
 	}
-	var instances Instances
-	if err = json.Unmarshal(b, &instances); err != nil {
+	instances := new(Instances)
+	if err = json.Unmarshal(b, instances); err != nil {
 		return nil, err
 	}
-	return &instances, nil
+	return instances, nil
 }
 
 func (s Instances) Check() {
