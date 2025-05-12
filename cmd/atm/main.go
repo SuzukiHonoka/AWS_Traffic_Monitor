@@ -1,8 +1,8 @@
 package main
 
 import (
-	"AWS_Trafiic_Monitor/pkg/atm"
 	"flag"
+	"github.com/SuzukiHonoka/AWS-Traffic-Monitor/pkg/atm"
 	"log"
 	"os"
 	"os/signal"

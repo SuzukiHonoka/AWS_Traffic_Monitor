@@ -1,9 +1,9 @@
 package atm
 
 import (
-	"AWS_Trafiic_Monitor/internal/api"
 	"context"
 	"fmt"
+	"github.com/SuzukiHonoka/AWS-Traffic-Monitor/internal/api"
 	"log"
 	"time"
 )

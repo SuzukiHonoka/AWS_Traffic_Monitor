@@ -1,4 +1,4 @@
-module AWS_Trafiic_Monitor
+module github.com/SuzukiHonoka/AWS-Traffic-Monitor
 
 go 1.24
 

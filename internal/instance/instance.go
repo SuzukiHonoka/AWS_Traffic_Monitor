@@ -1,8 +1,8 @@
 package instance
 
 import (
-	"AWS_Trafiic_Monitor/internal/api"
-	"AWS_Trafiic_Monitor/internal/utils"
+	"github.com/SuzukiHonoka/AWS-Traffic-Monitor/internal/api"
+	"github.com/SuzukiHonoka/AWS-Traffic-Monitor/internal/utils"
 	"github.com/aws/aws-sdk-go-v2/service/lightsail/types"
 	"log"
 	"time"

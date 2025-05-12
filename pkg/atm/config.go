@@ -1,9 +1,9 @@
 package atm
 
 import (
-	"AWS_Trafiic_Monitor/internal/api"
-	"AWS_Trafiic_Monitor/internal/instance"
 	"encoding/json"
+	"github.com/SuzukiHonoka/AWS-Traffic-Monitor/internal/api"
+	"github.com/SuzukiHonoka/AWS-Traffic-Monitor/internal/instance"
 	"os"
 )
 

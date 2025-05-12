@@ -1,11 +1,11 @@
 package api
 
 import (
-	"AWS_Trafiic_Monitor/internal/model"
-	"AWS_Trafiic_Monitor/internal/utils"
 	"context"
 	"errors"
 	"fmt"
+	"github.com/SuzukiHonoka/AWS-Traffic-Monitor/internal/model"
+	"github.com/SuzukiHonoka/AWS-Traffic-Monitor/internal/utils"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
